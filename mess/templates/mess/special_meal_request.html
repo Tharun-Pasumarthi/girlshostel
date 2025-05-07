@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Special Meal Request - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">Special Meal Request</h2>
+                    
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date" 
+                                       min="{{ today|date:'Y-m-d' }}" required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="end_date" name="end_date" 
+                                       min="{{ today|date:'Y-m-d' }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="reason" class="form-label">Reason for Special Meal</label>
+                            <textarea class="form-control" id="reason" name="reason" rows="3" 
+                                      placeholder="Please explain why you need special meals..." required></textarea>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="dietary_requirements" class="form-label">Dietary Requirements</label>
+                            <textarea class="form-control" id="dietary_requirements" name="dietary_requirements" 
+                                      rows="3" placeholder="Please specify your dietary requirements..." required></textarea>
+                            <div class="form-text">
+                                Please be specific about any allergies, religious requirements, or medical conditions.
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Submit Request</button>
+                            <a href="{% url 'mess:request_list' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const startDate = document.getElementById('start_date');
+        const endDate = document.getElementById('end_date');
+        
+        startDate.addEventListener('change', function() {
+            endDate.min = this.value;
+            if (endDate.value && endDate.value < this.value) {
+                endDate.value = this.value;
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %} 

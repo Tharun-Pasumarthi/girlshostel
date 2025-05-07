@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Emergency Drill - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">Update Emergency Drill</h2>
+                    
+                    <div class="drill-info mb-4">
+                        <h5>{{ drill.title }}</h5>
+                        <div class="mb-2">
+                            <span class="badge bg-primary">{{ drill.get_drill_type_display }}</span>
+                            <span class="text-muted ms-2">
+                                Scheduled for {{ drill.scheduled_date|date:"F d, Y" }}
+                            </span>
+                        </div>
+                        <p>{{ drill.description|linebreaks }}</p>
+                    </div>
+                    
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="conducted_date" class="form-label">Conducted Date</label>
+                            <input type="date" class="form-control" id="conducted_date" name="conducted_date" 
+                                   value="{{ drill.conducted_date|date:'Y-m-d' if drill.conducted_date else '' }}" required>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="4" 
+                                      placeholder="Add notes about the drill's execution, observations, and outcomes...">{{ drill.notes }}</textarea>
+                            <div class="form-text">
+                                Include information about participation, effectiveness, and any issues encountered.
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Update Drill</button>
+                            <a href="{% url 'safety:emergency_drills' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

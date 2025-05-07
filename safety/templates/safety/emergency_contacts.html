@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Emergency Contacts - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Emergency Contacts</h2>
+        {% if user.role in 'ADMIN,WARDEN' %}
+            <a href="{% url 'safety:add_contact' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Contact
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        {% for contact in contacts %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ contact.name }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ contact.designation }}</h6>
+                        <div class="contact-info mt-3">
+                            <p class="mb-2">
+                                <i class="fas fa-phone text-primary"></i>
+                                <a href="tel:{{ contact.phone }}" class="text-decoration-none">
+                                    {{ contact.phone }}
+                                </a>
+                            </p>
+                            {% if contact.email %}
+                                <p class="mb-0">
+                                    <i class="fas fa-envelope text-primary"></i>
+                                    <a href="mailto:{{ contact.email }}" class="text-decoration-none">
+                                        {{ contact.email }}
+                                    </a>
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No emergency contacts available.
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

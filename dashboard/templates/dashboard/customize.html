@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block title %}Customize Dashboard - Girls' Hostel Management System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Add Widget</h4>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Widget Title</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                            {% if form.title.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.title.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="widget_type" class="form-label">Widget Type</label>
+                            <select class="form-select" id="widget_type" name="widget_type" required>
+                                <option value="">Select widget type</option>
+                                {% for value, label in form.fields.widget_type.choices %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if form.widget_type.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.widget_type.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="data_source" class="form-label">Data Source</label>
+                            <select class="form-select" id="data_source" name="data_source" required>
+                                <option value="">Select data source</option>
+                                <option value="attendance">Attendance</option>
+                                <option value="fees">Fees</option>
+                                <option value="complaints">Complaints</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="bookings">Facility Bookings</option>
+                            </select>
+                            {% if form.data_source.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.data_source.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="position" class="form-label">Position</label>
+                            <input type="number" class="form-control" id="position" name="position" 
+                                   min="0" value="0" required>
+                            {% if form.position.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.position.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="is_active" 
+                                       name="is_active" checked>
+                                <label class="form-check-label" for="is_active">Active</label>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Add Widget</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Current Widgets</h4>
+                    
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Data Source</th>
+                                    <th>Position</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="widgets-list">
+                                {% for widget in widgets %}
+                                    <tr data-widget-id="{{ widget.id }}">
+                                        <td>{{ widget.title }}</td>
+                                        <td>{{ widget.get_widget_type_display }}</td>
+                                        <td>{{ widget.data_source|title }}</td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm position-input" 
+                                                   value="{{ widget.position }}" min="0">
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if widget.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                                {{ widget.is_active|yesno:"Active,Inactive" }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary toggle-widget" 
+                                                    data-widget-id="{{ widget.id }}"
+                                                    data-is-active="{{ widget.is_active|lower }}">
+                                                <i class="fas {% if widget.is_active %}fa-eye-slash{% else %}fa-eye{% endif %}"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger delete-widget" 
+                                                    data-widget-id="{{ widget.id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center">No widgets added yet.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/dashboard.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle widget position updates
+        const positionInputs = document.querySelectorAll('.position-input');
+        positionInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                const widgetId = this.closest('tr').dataset.widgetId;
+                const newPosition = this.value;
+                
+                fetch('{% url "dashboard:update_widget_position" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: `widget_id=${widgetId}&position=${newPosition}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Optionally refresh the page or update the UI
+                        location.reload();
+                    }
+                });
+            });
+        });
+        
+        // Handle widget toggle
+        const toggleButtons = document.querySelectorAll('.toggle-widget');
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const widgetId = this.dataset.widgetId;
+                const isActive = this.dataset.isActive === 'true';
+                
+                // Update the button's appearance
+                this.querySelector('i').classList.toggle('fa-eye');
+                this.querySelector('i').classList.toggle('fa-eye-slash');
+                this.dataset.isActive = (!isActive).toString();
+                
+                // Update the status badge
+                const statusBadge = this.closest('tr').querySelector('.badge');
+                statusBadge.classList.toggle('bg-success');
+                statusBadge.classList.toggle('bg-danger');
+                statusBadge.textContent = isActive ? 'Inactive' : 'Active';
+            });
+        });
+        
+        // Handle widget deletion
+        const deleteButtons = document.querySelectorAll('.delete-widget');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                if (confirm('Are you sure you want to delete this widget?')) {
+                    const widgetId = this.dataset.widgetId;
+                    // Add deletion logic here
+                }
+            });
+        });
+    });
+</script>
+{% endblock %} 

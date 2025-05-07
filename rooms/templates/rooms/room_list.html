@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Room Management - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Room Management</h2>
+        {% if user.role == 'ADMIN' or user.role == 'WARDEN' %}
+            <a href="{% url 'rooms:room_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add New Room
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        {% for room in rooms %}
+            <div class="col-md-4 mb-4">
+                <div class="card room-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="card-title mb-0">Room {{ room.room_number }}</h5>
+                            <span class="badge {% if room.is_available %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ room.get_status_display }}
+                            </span>
+                        </div>
+                        
+                        <p class="card-text">
+                            <strong>Type:</strong> {{ room.get_room_type_display }}<br>
+                            <strong>Capacity:</strong> {{ room.capacity }} students<br>
+                            <strong>Floor:</strong> {{ room.floor }}<br>
+                            <strong>Block:</strong> {{ room.block }}
+                        </p>
+                        
+                        {% if room.description %}
+                            <p class="card-text">{{ room.description }}</p>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <a href="{% url 'rooms:room_detail' room.id %}" class="btn btn-info btn-sm">
+                                <i class="fas fa-info-circle"></i> Details
+                            </a>
+                            
+                            {% if user.role == 'ADMIN' or user.role == 'WARDEN' %}
+                                <div class="btn-group">
+                                    <a href="{% url 'rooms:room_edit' room.id %}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <a href="{% url 'rooms:room_delete' room.id %}" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No rooms found. {% if user.role == 'ADMIN' or user.role == 'WARDEN' %}Click the "Add New Room" button to create one.{% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

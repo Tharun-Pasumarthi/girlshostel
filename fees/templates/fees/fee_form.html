@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if fee %}Edit Fee{% else %}Add Fee{% endif %} - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">
+                        {% if fee %}
+                            Edit Fee
+                        {% else %}
+                            Add New Fee
+                        {% endif %}
+                    </h2>
+                    
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if not fee %}
+                            <div class="mb-3">
+                                <label for="student" class="form-label">Student</label>
+                                <select class="form-select" id="student" name="student" required>
+                                    <option value="">Select student</option>
+                                    {% for student in students %}
+                                        <option value="{{ student.id }}">{{ student.get_full_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Fee Type</label>
+                            <select class="form-select" id="type" name="type" required>
+                                <option value="">Select type</option>
+                                {% for value, label in fee.TYPE_CHOICES %}
+                                    <option value="{{ value }}" {% if fee.type == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">Amount (₹)</label>
+                            <input type="number" class="form-control" id="amount" name="amount" 
+                                   value="{{ fee.amount|default:'' }}" step="0.01" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="due_date" class="form-label">Due Date</label>
+                            <input type="date" class="form-control" id="due_date" name="due_date" 
+                                   value="{{ fee.due_date|date:'Y-m-d'|default:'' }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3">{{ fee.description|default:'' }}</textarea>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                {% if fee %}Update Fee{% else %}Add Fee{% endif %}
+                            </button>
+                            <a href="{% url 'fees:fee_list' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

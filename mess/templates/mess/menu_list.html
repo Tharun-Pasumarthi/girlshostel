@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Mess Menu - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Mess Menu</h2>
+        {% if user.role in 'ADMIN,WARDEN' %}
+            <a href="{% url 'mess:menu_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Menu
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        {% for menu in menus %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            {{ menu.get_day_display }} - {{ menu.get_meal_type_display }}
+                        </h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            {{ menu.date|date:"F d, Y" }}
+                        </h6>
+                        <p class="card-text">
+                            {{ menu.items|linebreaks }}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'mess:menu_detail' menu.id %}" class="btn btn-info btn-sm">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
+                            {% if user.role == 'STUDENT' %}
+                                <a href="{% url 'mess:submit_feedback' menu.id %}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-star"></i> Rate & Review
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No menu items available for the selected period.
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

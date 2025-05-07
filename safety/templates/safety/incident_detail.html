@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Incident Details - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <h2 class="card-title">{{ incident.title }}</h2>
+                    <div class="mb-3">
+                        <span class="badge {% if incident.severity == 'CRITICAL' %}bg-danger
+                                      {% elif incident.severity == 'HIGH' %}bg-warning
+                                      {% elif incident.severity == 'MEDIUM' %}bg-info
+                                      {% else %}bg-secondary{% endif %}">
+                            {{ incident.get_severity_display }}
+                        </span>
+                        <span class="badge {% if incident.status == 'RESOLVED' %}bg-success
+                                      {% elif incident.status == 'IN_PROGRESS' %}bg-primary
+                                      {% elif incident.status == 'CLOSED' %}bg-secondary
+                                      {% else %}bg-warning{% endif %}">
+                            {{ incident.get_status_display }}
+                        </span>
+                    </div>
+                    
+                    <dl class="row">
+                        <dt class="col-sm-3">Location</dt>
+                        <dd class="col-sm-9">{{ incident.location }}</dd>
+                        
+                        <dt class="col-sm-3">Reported By</dt>
+                        <dd class="col-sm-9">{{ incident.reported_by.get_full_name }}</dd>
+                        
+                        <dt class="col-sm-3">Reported At</dt>
+                        <dd class="col-sm-9">{{ incident.reported_at|date:"F d, Y H:i" }}</dd>
+                        
+                        <dt class="col-sm-3">Description</dt>
+                        <dd class="col-sm-9">{{ incident.description|linebreaks }}</dd>
+                        
+                        {% if incident.resolved_at %}
+                            <dt class="col-sm-3">Resolved At</dt>
+                            <dd class="col-sm-9">{{ incident.resolved_at|date:"F d, Y H:i" }}</dd>
+                            
+                            <dt class="col-sm-3">Resolved By</dt>
+                            <dd class="col-sm-9">{{ incident.resolved_by.get_full_name }}</dd>
+                            
+                            <dt class="col-sm-3">Resolution Notes</dt>
+                            <dd class="col-sm-9">{{ incident.resolution_notes|linebreaks }}</dd>
+                        {% endif %}
+                    </dl>
+                </div>
+            </div>
+        </div>
+        
+        {% if user.role in 'ADMIN,WARDEN' %}
+            <div class="col-md-4">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h4 class="card-title">Update Status</h4>
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" name="status" required>
+                                    <option value="REPORTED" {% if incident.status == 'REPORTED' %}selected{% endif %}>
+                                        Reported
+                                    </option>
+                                    <option value="IN_PROGRESS" {% if incident.status == 'IN_PROGRESS' %}selected{% endif %}>
+                                        In Progress
+                                    </option>
+                                    <option value="RESOLVED" {% if incident.status == 'RESOLVED' %}selected{% endif %}>
+                                        Resolved
+                                    </option>
+                                    <option value="CLOSED" {% if incident.status == 'CLOSED' %}selected{% endif %}>
+                                        Closed
+                                    </option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="resolution_notes" class="form-label">Resolution Notes</label>
+                                <textarea class="form-control" id="resolution_notes" name="resolution_notes" 
+                                          rows="4">{{ incident.resolution_notes }}</textarea>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Update Status</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Warden Dashboard - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            {% if user.profile.avatar %}
+                                <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name }}" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                            {% else %}
+                                <img src="{% static 'images/default-avatar.png' %}" alt="{{ user.get_full_name }}" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h2 class="mb-1">Welcome, {{ user.get_full_name }}!</h2>
+                            <p class="text-muted mb-0">Warden | {{ user.warden.block.name }}</p>
+                        </div>
+                        <div class="text-end">
+                            <a href="{% url 'profile' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-user-edit me-2"></i>Edit Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm stat-card bg-primary">
+                <div class="card-body">
+                    <i class="fas fa-users"></i>
+                    <div class="stat-value">{{ total_students }}</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm stat-card bg-success">
+                <div class="card-body">
+                    <i class="fas fa-bed"></i>
+                    <div class="stat-value">{{ available_rooms }}</div>
+                    <div class="stat-label">Available Rooms</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm stat-card bg-warning">
+                <div class="card-body">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <div class="stat-value">{{ pending_complaints }}</div>
+                    <div class="stat-label">Pending Complaints</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm stat-card bg-info">
+                <div class="card-body">
+                    <i class="fas fa-calendar-check"></i>
+                    <div class="stat-value">{{ pending_leaves }}</div>
+                    <div class="stat-label">Pending Leaves</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-md-8">
+            <!-- Recent Complaints -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Recent Complaints</h5>
+                    <a href="{% url 'complaints_management' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_complaints %}
+                        <div class="list-group list-group-flush">
+                            {% for complaint in recent_complaints %}
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ complaint.title }}</h6>
+                                        <span class="badge bg-{{ complaint.status|lower }}">{{ complaint.status }}</span>
+                                    </div>
+                                    <p class="mb-1">{{ complaint.description|truncatewords:30 }}</p>
+                                    <small class="text-muted">
+                                        By {{ complaint.student.get_full_name }} | {{ complaint.created_at|date:"M d, Y" }}
+                                    </small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">No recent complaints.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Leave Applications -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Leave Applications</h5>
+                    <a href="{% url 'leave_management' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if leave_applications %}
+                        <div class="list-group list-group-flush">
+                            {% for leave in leave_applications %}
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ leave.student.get_full_name }}</h6>
+                                        <span class="badge bg-{{ leave.status|lower }}">{{ leave.status }}</span>
+                                    </div>
+                                    <p class="mb-1">
+                                        <strong>From:</strong> {{ leave.start_date|date:"M d, Y" }}<br>
+                                        <strong>To:</strong> {{ leave.end_date|date:"M d, Y" }}<br>
+                                        <strong>Reason:</strong> {{ leave.reason|truncatewords:20 }}
+                                    </p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">No pending leave applications.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-md-4">
+            <!-- Quick Actions -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'room_management' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-bed me-2"></i>Manage Rooms
+                        </a>
+                        <a href="{% url 'attendance_management' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-calendar-check me-2"></i>Take Attendance
+                        </a>
+                        <a href="{% url 'announcement_create' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-bullhorn me-2"></i>Create Announcement
+                        </a>
+                        <a href="{% url 'event_create' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-calendar-plus me-2"></i>Create Event
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Summary -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Today's Attendance</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <h3 class="mb-0">{{ attendance_percentage }}%</h3>
+                        <p class="text-muted mb-0">Present Today</p>
+                    </div>
+                    <div class="progress mb-3">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ attendance_percentage }}%"></div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <h5 class="mb-0">{{ present_count }}</h5>
+                            <small class="text-muted">Present</small>
+                        </div>
+                        <div class="col-4">
+                            <h5 class="mb-0">{{ absent_count }}</h5>
+                            <small class="text-muted">Absent</small>
+                        </div>
+                        <div class="col-4">
+                            <h5 class="mb-0">{{ late_count }}</h5>
+                            <small class="text-muted">Late</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Announcements -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Recent Announcements</h5>
+                </div>
+                <div class="card-body">
+                    {% if announcements %}
+                        <div class="list-group list-group-flush">
+                            {% for announcement in announcements %}
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ announcement.title }}</h6>
+                                        <small class="text-muted">{{ announcement.created_at|date:"M d, Y" }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ announcement.content|truncatewords:20 }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">No recent announcements.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+    tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Update stats every 5 minutes
+    setInterval(function() {
+        fetch('{% url "warden_dashboard_stats" %}')
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = data.total_students;
+                document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = data.available_rooms;
+                document.querySelector('.stat-card:nth-child(3) .stat-value').textContent = data.pending_complaints;
+                document.querySelector('.stat-card:nth-child(4) .stat-value').textContent = data.pending_leaves;
+            });
+    }, 300000);
+</script>
+{% endblock %} 

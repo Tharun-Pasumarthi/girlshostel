@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Girls' Hostel Management System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Students</h5>
+                    <h2 class="card-text">{{ stats.total_students }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Occupied Rooms</h5>
+                    <h2 class="card-text">{{ stats.occupied_rooms }}/{{ stats.total_rooms }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Complaints</h5>
+                    <h2 class="card-text">{{ stats.pending_complaints }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Upcoming Bookings</h5>
+                    <h2 class="card-text">{{ stats.upcoming_bookings }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customizable Widgets -->
+    <div class="row" id="widgets-container">
+        {% for widget in widgets %}
+            <div class="col-md-6 mb-4 widget" data-widget-id="{{ widget.id }}">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{{ widget.title }}</h5>
+                        <div class="widget-actions">
+                            <button class="btn btn-sm btn-outline-primary refresh-widget" 
+                                    data-widget-id="{{ widget.id }}">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body widget-content" data-widget-id="{{ widget.id }}">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Recent Activities -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Complaints</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for complaint in recent_activities.complaints %}
+                            <a href="{% url 'complaints:complaint_detail' complaint.id %}" 
+                               class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ complaint.title }}</h6>
+                                    <small>{{ complaint.created_at|timesince }} ago</small>
+                                </div>
+                                <p class="mb-1">{{ complaint.description|truncatechars:50 }}</p>
+                                <small class="text-muted">
+                                    Status: <span class="badge bg-{{ complaint.status|lower }}">
+                                        {{ complaint.get_status_display }}
+                                    </span>
+                                </small>
+                            </a>
+                        {% empty %}
+                            <p class="text-muted text-center">No recent complaints</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Maintenance</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for maintenance in recent_activities.maintenance %}
+                            <a href="{% url 'facilities:maintenance_detail' maintenance.id %}" 
+                               class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ maintenance.title }}</h6>
+                                    <small>{{ maintenance.created_at|timesince }} ago</small>
+                                </div>
+                                <p class="mb-1">{{ maintenance.description|truncatechars:50 }}</p>
+                                <small class="text-muted">
+                                    Priority: <span class="badge bg-{{ maintenance.priority|lower }}">
+                                        {{ maintenance.get_priority_display }}
+                                    </span>
+                                </small>
+                            </a>
+                        {% empty %}
+                            <p class="text-muted text-center">No recent maintenance requests</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Bookings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for booking in recent_activities.bookings %}
+                            <a href="{% url 'facilities:booking_detail' booking.id %}" 
+                               class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ booking.facility.name }}</h6>
+                                    <small>{{ booking.created_at|timesince }} ago</small>
+                                </div>
+                                <p class="mb-1">
+                                    {{ booking.booking_date|date:"M d, Y" }} 
+                                    ({{ booking.start_time|time:"g:i A" }} - {{ booking.end_time|time:"g:i A" }})
+                                </p>
+                                <small class="text-muted">
+                                    Status: <span class="badge bg-{{ booking.status|lower }}">
+                                        {{ booking.get_status_display }}
+                                    </span>
+                                </small>
+                            </a>
+                        {% empty %}
+                            <p class="text-muted text-center">No recent bookings</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %} 

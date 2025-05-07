@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Book {{ facility.name }} - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">Book {{ facility.name }}</h2>
+                    
+                    <div class="facility-info mb-4">
+                        <h5>{{ facility.name }}</h5>
+                        <p class="text-muted">
+                            <i class="fas fa-map-marker-alt"></i> {{ facility.location }}
+                        </p>
+                        {% if facility.operating_hours %}
+                            <p class="text-muted">
+                                <i class="fas fa-clock"></i> {{ facility.operating_hours }}
+                            </p>
+                        {% endif %}
+                    </div>
+                    
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="booking_date" class="form-label">Booking Date</label>
+                            <input type="date" class="form-control" id="booking_date" name="booking_date" 
+                                   min="{{ today|date:'Y-m-d' }}" required>
+                            {% if form.booking_date.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.booking_date.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="start_time" class="form-label">Start Time</label>
+                                    <input type="time" class="form-control" id="start_time" name="start_time" required>
+                                    {% if form.start_time.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.start_time.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="end_time" class="form-label">End Time</label>
+                                    <input type="time" class="form-control" id="end_time" name="end_time" required>
+                                    {% if form.end_time.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.end_time.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="purpose" class="form-label">Purpose</label>
+                            <textarea class="form-control" id="purpose" name="purpose" rows="3" 
+                                      placeholder="Please describe the purpose of your booking..." required></textarea>
+                            {% if form.purpose.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.purpose.errors }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                Provide details about how you plan to use the facility.
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Submit Booking Request</button>
+                            <a href="{% url 'facilities:facility_detail' facility.id %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    {% if user.role == 'ADMIN' %}
+        <!-- Admin Dashboard -->
+        <h2 class="mb-4">Admin Dashboard</h2>
+        
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Students</h5>
+                        <p class="display-4">{{ total_students }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Rooms</h5>
+                        <p class="display-4">{{ total_rooms }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Available Rooms</h5>
+                        <p class="display-4">{{ available_rooms }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Wardens</h5>
+                        <p class="display-4">{{ total_wardens }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Recent Users</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Role</th>
+                                        <th>Joined</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user in recent_users %}
+                                    <tr>
+                                        <td>{{ user.get_full_name }}</td>
+                                        <td>{{ user.get_role_display }}</td>
+                                        <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                                        <td>
+                                            <a href="{% url 'accounts:user_detail' user.id %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'accounts:edit_user' user.id %}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'accounts:user_create' %}" class="btn btn-primary">
+                                <i class="fas fa-user-plus"></i> Add New User
+                            </a>
+                            <a href="{% url 'rooms:room_create' %}" class="btn btn-success">
+                                <i class="fas fa-plus"></i> Add New Room
+                            </a>
+                            <a href="{% url 'rooms:allocate_room' %}" class="btn btn-info">
+                                <i class="fas fa-user-plus"></i> Assign Room
+                            </a>
+                            <a href="{% url 'complaints:complaint_list' %}" class="btn btn-warning">
+                                <i class="fas fa-exclamation-circle"></i> View Complaints
+                            </a>
+                            <a href="{% url 'attendance:attendance_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-calendar-check"></i> Manage Attendance
+                            </a>
+                            <a href="{% url 'fees:fee_list' %}" class="btn btn-dark">
+                                <i class="fas fa-money-bill"></i> Manage Fees
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    {% elif user.role == 'WARDEN' %}
+        <!-- Warden Dashboard -->
+        <h2 class="mb-4">Warden Dashboard</h2>
+        
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Students</h5>
+                        <p class="display-4">{{ total_students }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Available Rooms</h5>
+                        <p class="display-4">{{ available_rooms }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Pending Complaints</h5>
+                        <p class="display-4">{{ pending_complaints }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Recent Complaints</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for complaint in recent_complaints %}
+                                    <tr>
+                                        <td>{{ complaint.student.get_full_name }}</td>
+                                        <td>{{ complaint.get_type_display }}</td>
+                                        <td>
+                                            <span class="badge {% if complaint.status == 'PENDING' %}bg-warning{% elif complaint.status == 'RESOLVED' %}bg-success{% else %}bg-danger{% endif %}">
+                                                {{ complaint.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'complaints:complaint_detail' complaint.id %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'complaints:complaint_edit' complaint.id %}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'rooms:room_list' %}" class="btn btn-primary">
+                                <i class="fas fa-door-open"></i> Manage Rooms
+                            </a>
+                            <a href="{% url 'complaints:complaint_list' %}" class="btn btn-success">
+                                <i class="fas fa-exclamation-circle"></i> View All Complaints
+                            </a>
+                            <a href="{% url 'attendance:attendance_list' %}" class="btn btn-info">
+                                <i class="fas fa-calendar-check"></i> Manage Attendance
+                            </a>
+                            <a href="{% url 'fees:fee_list' %}" class="btn btn-warning">
+                                <i class="fas fa-money-bill"></i> View Fee Status
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    {% else %}
+        <!-- Student Dashboard -->
+        <h2 class="mb-4">Student Dashboard</h2>
+        
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Room Number</h5>
+                        <p class="display-4">{{ room.room_number }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Attendance</h5>
+                        <p class="display-4">{{ attendance_percentage }}%</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Pending Fees</h5>
+                        <p class="display-4">₹{{ pending_fees }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Recent Activities</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            {% for activity in recent_activities %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ activity.title }}</h6>
+                                    <small>{{ activity.date|date:"M d, Y" }}</small>
+                                </div>
+                                <p class="mb-1">{{ activity.description }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'rooms:room_detail' room.id %}" class="btn btn-primary">
+                                <i class="fas fa-door-open"></i> View Room Details
+                            </a>
+                            <a href="{% url 'complaints:complaint_create' %}" class="btn btn-success">
+                                <i class="fas fa-exclamation-circle"></i> Submit Complaint
+                            </a>
+                            <a href="{% url 'attendance:attendance_view' %}" class="btn btn-info">
+                                <i class="fas fa-calendar-check"></i> View Attendance
+                            </a>
+                            <a href="{% url 'fees:fee_view' %}" class="btn btn-warning">
+                                <i class="fas fa-money-bill"></i> View Fee Status
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

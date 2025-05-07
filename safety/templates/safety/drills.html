@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Emergency Drills - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Emergency Drills</h2>
+        {% if user.role in 'ADMIN,WARDEN' %}
+            <a href="{% url 'safety:schedule_drill' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Schedule Drill
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Upcoming Drills</h5>
+                </div>
+                <div class="card-body">
+                    {% for drill in upcoming_drills %}
+                        <div class="drill-item mb-4">
+                            <h5>{{ drill.title }}</h5>
+                            <div class="mb-2">
+                                <span class="badge bg-primary">{{ drill.get_drill_type_display }}</span>
+                                <span class="text-muted ms-2">
+                                    Scheduled for {{ drill.scheduled_date|date:"F d, Y" }}
+                                </span>
+                            </div>
+                            <p>{{ drill.description|linebreaks }}</p>
+                            {% if user.role in 'ADMIN,WARDEN' %}
+                                <a href="{% url 'safety:update_drill' drill.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i> Update
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <p class="text-muted">No upcoming drills scheduled.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Recent Drills</h5>
+                </div>
+                <div class="card-body">
+                    {% for drill in recent_drills %}
+                        <div class="drill-item mb-3">
+                            <h6>{{ drill.title }}</h6>
+                            <div class="mb-2">
+                                <span class="badge bg-secondary">{{ drill.get_drill_type_display }}</span>
+                                <span class="text-muted ms-2">
+                                    Conducted on {{ drill.conducted_date|date:"M d, Y" }}
+                                </span>
+                            </div>
+                            {% if drill.notes %}
+                                <p class="small text-muted">{{ drill.notes|truncatechars:100 }}</p>
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <p class="text-muted">No recent drills conducted.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

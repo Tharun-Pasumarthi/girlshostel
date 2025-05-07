@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if complaint %}Edit Complaint{% else %}Submit Complaint{% endif %} - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">
+                        {% if complaint %}
+                            Edit Complaint
+                        {% else %}
+                            Submit New Complaint
+                        {% endif %}
+                    </h2>
+                    
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if user.role in 'ADMIN,WARDEN' and complaint %}
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" name="status" required>
+                                    {% for value, label in complaint.STATUS_CHOICES %}
+                                        <option value="{{ value }}" {% if complaint.status == value %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="resolution_notes" class="form-label">Resolution Notes</label>
+                                <textarea class="form-control" id="resolution_notes" name="resolution_notes" rows="3">{{ complaint.resolution_notes }}</textarea>
+                            </div>
+                        {% else %}
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Title</label>
+                                <input type="text" class="form-control" id="title" name="title" value="{{ complaint.title|default:'' }}" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="type" class="form-label">Type</label>
+                                <select class="form-select" id="type" name="type" required>
+                                    <option value="">Select type</option>
+                                    {% for value, label in complaint.TYPE_CHOICES %}
+                                        <option value="{{ value }}" {% if complaint.type == value %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="5" required>{{ complaint.description|default:'' }}</textarea>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                {% if complaint %}Update Complaint{% else %}Submit Complaint{% endif %}
+                            </button>
+                            <a href="{% url 'complaints:complaint_list' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

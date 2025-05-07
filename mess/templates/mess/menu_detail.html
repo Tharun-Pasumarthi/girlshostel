@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ menu.get_meal_type_display }} Menu - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <h2 class="card-title">
+                        {{ menu.get_day_display }} - {{ menu.get_meal_type_display }}
+                    </h2>
+                    <h6 class="card-subtitle mb-3 text-muted">
+                        {{ menu.date|date:"F d, Y" }}
+                    </h6>
+                    
+                    <div class="menu-items mb-4">
+                        <h5>Menu Items</h5>
+                        <p class="card-text">
+                            {{ menu.items|linebreaks }}
+                        </p>
+                    </div>
+                    
+                    {% if user.role == 'STUDENT' %}
+                        <a href="{% url 'mess:submit_feedback' menu.id %}" class="btn btn-primary">
+                            <i class="fas fa-star"></i> Rate & Review
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h4 class="card-title">Feedback Summary</h4>
+                    <div class="text-center mb-4">
+                        <h2 class="display-4">{{ avg_rating }}</h2>
+                        <div class="text-warning">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= avg_rating %}
+                                    <i class="fas fa-star"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <p class="text-muted">{{ feedback.count }} reviews</p>
+                    </div>
+                    
+                    <h5>Recent Reviews</h5>
+                    {% for review in feedback %}
+                        <div class="border-bottom py-2">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ review.student.get_full_name }}</strong>
+                                <div class="text-warning">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= review.rating %}
+                                            <i class="fas fa-star"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <p class="mb-0">{{ review.comment }}</p>
+                            <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                        </div>
+                    {% empty %}
+                        <p class="text-muted">No reviews yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

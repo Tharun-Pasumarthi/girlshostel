@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Room {{ room.room_number }} - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <h2 class="card-title">Room {{ room.room_number }}</h2>
+                        <span class="badge {% if room.is_available %}bg-success{% else %}bg-danger{% endif %}">
+                            {{ room.get_status_display }}
+                        </span>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p><strong>Type:</strong> {{ room.get_room_type_display }}</p>
+                            <p><strong>Capacity:</strong> {{ room.capacity }} students</p>
+                            <p><strong>Floor:</strong> {{ room.floor }}</p>
+                            <p><strong>Block:</strong> {{ room.block }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Current Occupants:</strong> {{ room.current_occupants_count }}/{{ room.capacity }}</p>
+                            <p><strong>Last Updated:</strong> {{ room.updated_at|date:"F d, Y H:i" }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if room.description %}
+                        <div class="mb-4">
+                            <h5>Description</h5>
+                            <p>{{ room.description }}</p>
+                        </div>
+                    {% endif %}
+                    
+                    {% if user.role == 'ADMIN' or user.role == 'WARDEN' %}
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'rooms:room_edit' room.id %}" class="btn btn-primary">
+                                <i class="fas fa-edit"></i> Edit Room
+                            </a>
+                            <a href="{% url 'rooms:room_delete' room.id %}" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Delete Room
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Current Occupants</h5>
+                </div>
+                <div class="card-body">
+                    {% if occupants %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Roll Number</th>
+                                        <th>Check-in Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for occupant in occupants %}
+                                        <tr>
+                                            <td>{{ occupant.student.get_full_name }}</td>
+                                            <td>{{ occupant.student.roll_number }}</td>
+                                            <td>{{ occupant.check_in_date|date:"M d, Y" }}</td>
+                                            <td>
+                                                {% if user.role == 'ADMIN' or user.role == 'WARDEN' %}
+                                                    <a href="{% url 'rooms:allocation_edit' occupant.id %}" class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="{% url 'rooms:allocation_delete' occupant.id %}" class="btn btn-sm btn-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">No occupants in this room.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Room History</h5>
+                </div>
+                <div class="card-body">
+                    {% if room_history %}
+                        <div class="list-group">
+                            {% for history in room_history %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ history.get_action_display }}</h6>
+                                        <small>{{ history.created_at|date:"M d, Y" }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ history.description }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">No history available.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if user.role == 'ADMIN' or user.role == 'WARDEN' %}
+                <div class="card shadow">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'rooms:allocation_create' %}?room={{ room.id }}" class="btn btn-success">
+                                <i class="fas fa-user-plus"></i> Assign Student
+                            </a>
+                            <a href="#" class="btn btn-info">
+                                <i class="fas fa-clipboard-list"></i> View Maintenance History
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

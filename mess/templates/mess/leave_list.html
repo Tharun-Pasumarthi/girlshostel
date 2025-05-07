@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Mess Leave Requests - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Mess Leave Requests</h2>
+        {% if user.role == 'STUDENT' %}
+            <a href="{% url 'mess:mess_leave_request' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> New Request
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Duration</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for leave in leaves %}
+                            <tr>
+                                <td>{{ leave.student.get_full_name }}</td>
+                                <td>{{ leave.start_date|date:"M d, Y" }}</td>
+                                <td>{{ leave.end_date|date:"M d, Y" }}</td>
+                                <td>{{ leave.duration }} days</td>
+                                <td>{{ leave.reason|truncatechars:50 }}</td>
+                                <td>
+                                    <span class="badge {% if leave.status == 'APPROVED' %}bg-success
+                                                      {% elif leave.status == 'REJECTED' %}bg-danger
+                                                      {% else %}bg-warning{% endif %}">
+                                        {{ leave.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-info btn-sm" 
+                                            data-bs-toggle="modal" data-bs-target="#leaveModal{{ leave.id }}">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    
+                                    {% if user.role in 'ADMIN,WARDEN' and leave.status == 'PENDING' %}
+                                        <form method="post" action="{% url 'mess:approve_leave' leave.id %}" 
+                                              class="d-inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="approve">
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" action="{% url 'mess:approve_leave' leave.id %}" 
+                                              class="d-inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            
+                            <!-- Leave Details Modal -->
+                            <div class="modal fade" id="leaveModal{{ leave.id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Leave Request Details</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <dl class="row">
+                                                <dt class="col-sm-4">Student</dt>
+                                                <dd class="col-sm-8">{{ leave.student.get_full_name }}</dd>
+                                                
+                                                <dt class="col-sm-4">Period</dt>
+                                                <dd class="col-sm-8">
+                                                    {{ leave.start_date|date:"M d, Y" }} to 
+                                                    {{ leave.end_date|date:"M d, Y" }}
+                                                </dd>
+                                                
+                                                <dt class="col-sm-4">Duration</dt>
+                                                <dd class="col-sm-8">{{ leave.duration }} days</dd>
+                                                
+                                                <dt class="col-sm-4">Reason</dt>
+                                                <dd class="col-sm-8">{{ leave.reason }}</dd>
+                                                
+                                                <dt class="col-sm-4">Status</dt>
+                                                <dd class="col-sm-8">
+                                                    <span class="badge {% if leave.status == 'APPROVED' %}bg-success
+                                                                  {% elif leave.status == 'REJECTED' %}bg-danger
+                                                                  {% else %}bg-warning{% endif %}">
+                                                        {{ leave.get_status_display }}
+                                                    </span>
+                                                </dd>
+                                                
+                                                {% if leave.approved_by %}
+                                                    <dt class="col-sm-4">Approved By</dt>
+                                                    <dd class="col-sm-8">{{ leave.approved_by.get_full_name }}</dd>
+                                                {% endif %}
+                                                
+                                                {% if leave.status == 'APPROVED' %}
+                                                    <dt class="col-sm-4">Rebate Amount</dt>
+                                                    <dd class="col-sm-8">₹{{ leave.rebate_amount }}</dd>
+                                                {% endif %}
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center">No mess leave requests found.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

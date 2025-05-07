@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Facility Bookings - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Facility Bookings</h2>
+        <a href="{% url 'facilities:facility_list' %}" class="btn btn-primary">
+            <i class="fas fa-building"></i> View Facilities
+        </a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Facility</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Purpose</th>
+                            <th>Booked By</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'facilities:facility_detail' booking.facility.id %}">
+                                        {{ booking.facility.name }}
+                                    </a>
+                                </td>
+                                <td>{{ booking.booking_date|date:"M d, Y" }}</td>
+                                <td>
+                                    {{ booking.start_time|time:"g:i A" }} - 
+                                    {{ booking.end_time|time:"g:i A" }}
+                                </td>
+                                <td>{{ booking.purpose|truncatechars:50 }}</td>
+                                <td>{{ booking.booked_by.get_full_name }}</td>
+                                <td>
+                                    <span class="badge {% if booking.status == 'APPROVED' %}bg-success
+                                                  {% elif booking.status == 'PENDING' %}bg-warning
+                                                  {% elif booking.status == 'REJECTED' %}bg-danger
+                                                  {% else %}bg-secondary{% endif %}">
+                                        {{ booking.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if user.role in 'ADMIN,WARDEN' and booking.status == 'PENDING' %}
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-success" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#approveModal{{ booking.id }}">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#rejectModal{{ booking.id }}">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Approve Modal -->
+                                        <div class="modal fade" id="approveModal{{ booking.id }}" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Approve Booking</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <form method="post" action="{% url 'facilities:update_booking' booking.id %}">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="status" value="APPROVED">
+                                                        <div class="modal-body">
+                                                            <p>Are you sure you want to approve this booking request?</p>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit" class="btn btn-success">Approve</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Reject Modal -->
+                                        <div class="modal fade" id="rejectModal{{ booking.id }}" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Reject Booking</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <form method="post" action="{% url 'facilities:update_booking' booking.id %}">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="status" value="REJECTED">
+                                                        <div class="modal-body">
+                                                            <p>Are you sure you want to reject this booking request?</p>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit" class="btn btn-danger">Reject</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center">No bookings found.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

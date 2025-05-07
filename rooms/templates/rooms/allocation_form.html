@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edit Room Allocation{% else %}Assign Room{% endif %} - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">
+                        {% if form.instance.pk %}
+                            Edit Room Allocation
+                        {% else %}
+                            Assign Room
+                        {% endif %}
+                    </h2>
+                    
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="student" class="form-label">Student</label>
+                            <select class="form-select" id="student" name="student" required>
+                                <option value="">Select a student</option>
+                                {% for student in students %}
+                                    <option value="{{ student.id }}" {% if form.student.value == student.id %}selected{% endif %}>
+                                        {{ student.get_full_name }} ({{ student.roll_number }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            {% if form.student.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.student.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="room" class="form-label">Room</label>
+                            <select class="form-select" id="room" name="room" required>
+                                <option value="">Select a room</option>
+                                {% for room in rooms %}
+                                    <option value="{{ room.id }}" {% if form.room.value == room.id %}selected{% endif %}>
+                                        Room {{ room.room_number }} ({{ room.get_room_type_display }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            {% if form.room.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.room.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="check_in_date" class="form-label">Check-in Date</label>
+                            <input type="date" class="form-control" id="check_in_date" name="check_in_date" value="{{ form.check_in_date.value|date:'Y-m-d' }}" required>
+                            {% if form.check_in_date.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.check_in_date.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="check_out_date" class="form-label">Check-out Date</label>
+                            <input type="date" class="form-control" id="check_out_date" name="check_out_date" value="{{ form.check_out_date.value|date:'Y-m-d' }}">
+                            {% if form.check_out_date.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.check_out_date.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3">{{ form.notes.value|default:'' }}</textarea>
+                            {% if form.notes.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.notes.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                {% if form.instance.pk %}Update Allocation{% else %}Assign Room{% endif %}
+                            </button>
+                            <a href="{% url 'rooms:room_list' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

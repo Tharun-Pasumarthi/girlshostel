@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Safety Guidelines - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Safety Guidelines</h2>
+        {% if user.role in 'ADMIN,WARDEN' %}
+            <a href="{% url 'safety:add_guideline' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Guideline
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        {% for category, category_guidelines in guidelines.items %}
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">{{ category }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="accordion" id="accordion{{ category|slugify }}">
+                            {% for guideline in category_guidelines %}
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading{{ guideline.id }}">
+                                        <button class="accordion-button collapsed" type="button" 
+                                                data-bs-toggle="collapse" 
+                                                data-bs-target="#collapse{{ guideline.id }}">
+                                            {{ guideline.title }}
+                                        </button>
+                                    </h2>
+                                    <div id="collapse{{ guideline.id }}" 
+                                         class="accordion-collapse collapse" 
+                                         data-bs-parent="#accordion{{ category|slugify }}">
+                                        <div class="accordion-body">
+                                            {{ guideline.description|linebreaks }}
+                                            {% if user.role in 'ADMIN,WARDEN' %}
+                                                <div class="mt-3">
+                                                    <a href="{% url 'safety:edit_guideline' guideline.id %}" 
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-edit"></i> Edit
+                                                    </a>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No safety guidelines available.
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

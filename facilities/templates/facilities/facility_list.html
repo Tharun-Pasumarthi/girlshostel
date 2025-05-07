@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Hostel Facilities - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Hostel Facilities</h2>
+        {% if user.role in 'ADMIN,WARDEN' %}
+            <a href="{% url 'facilities:add_facility' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Facility
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        {% for category, category_name in categories.items %}
+            <div class="col-12 mb-4">
+                <h3 class="mb-3">{{ category_name }}</h3>
+                <div class="row">
+                    {% for facility in facilities %}
+                        {% if facility.category == category %}
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 shadow-sm">
+                                    {% if facility.image %}
+                                        <img src="{{ facility.image.url }}" class="card-img-top" alt="{{ facility.name }}">
+                                    {% endif %}
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ facility.name }}</h5>
+                                        <p class="card-text text-muted">
+                                            <i class="fas fa-map-marker-alt"></i> {{ facility.location }}
+                                        </p>
+                                        <p class="card-text">{{ facility.description|truncatechars:100 }}</p>
+                                        {% if facility.capacity %}
+                                            <p class="card-text">
+                                                <i class="fas fa-users"></i> Capacity: {{ facility.capacity }}
+                                            </p>
+                                        {% endif %}
+                                        {% if facility.operating_hours %}
+                                            <p class="card-text">
+                                                <i class="fas fa-clock"></i> {{ facility.operating_hours }}
+                                            </p>
+                                        {% endif %}
+                                        <div class="d-flex justify-content-between align-items-center mt-3">
+                                            <span class="badge {% if facility.is_available %}bg-success{% else %}bg-danger{% endif %}">
+                                                {{ facility.is_available|yesno:"Available,Not Available" }}
+                                            </span>
+                                            <a href="{% url 'facilities:facility_detail' facility.id %}" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                View Details
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

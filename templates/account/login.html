@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block title %}Login - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm border-0 rounded-lg mt-5">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h3 class="mb-0">Login</h3>
+                </div>
+                <div class="card-body p-4">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form class="login" method="POST" action="{% url 'account_login' %}">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="id_login" class="form-label">Email address</label>
+                            <input type="email" name="login" id="id_login" class="form-control" placeholder="Enter your email" required autofocus>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_password" class="form-label">Password</label>
+                            <input type="password" name="password" id="id_password" class="form-control" placeholder="Enter your password" required>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" name="remember" id="id_remember" class="form-check-input">
+                            <label class="form-check-label" for="id_remember">Remember me</label>
+                        </div>
+
+                        {% if redirect_field_value %}
+                            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+                        {% endif %}
+
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary btn-lg" type="submit">Sign In</button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="mb-2">
+                            <a href="{% url 'account_reset_password' %}" class="text-decoration-none">Forgot your password?</a>
+                        </p>
+                        <p class="mb-0">
+                            Don't have an account? 
+                            <a href="{% url 'account_signup' %}" class="text-decoration-none">Sign up</a>
+                        </p>
+                    </div>
+
+                    {% get_providers as socialaccount_providers %}
+                    {% if socialaccount_providers %}
+                        <div class="mt-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <hr class="flex-grow-1">
+                                <span class="mx-3 text-muted">or continue with</span>
+                                <hr class="flex-grow-1">
+                            </div>
+                            <div class="socialaccount_ballot">
+                                <div class="d-grid gap-2">
+                                    {% for provider in socialaccount_providers %}
+                                        {% if provider.id == "google" %}
+                                            <a href="{% provider_login_url provider.id process='login' %}" class="btn btn-outline-danger">
+                                                <i class="fab fa-google me-2"></i> Sign in with Google
+                                            </a>
+                                        {% elif provider.id == "facebook" %}
+                                            <a href="{% provider_login_url provider.id process='login' %}" class="btn btn-outline-primary">
+                                                <i class="fab fa-facebook-f me-2"></i> Sign in with Facebook
+                                            </a>
+                                        {% else %}
+                                            <a href="{% provider_login_url provider.id process='login' %}" class="btn btn-outline-secondary">
+                                                Sign in with {{ provider.name }}
+                                            </a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add form validation
+    document.querySelector('form.login').addEventListener('submit', function(e) {
+        const email = document.getElementById('id_login').value;
+        const password = document.getElementById('id_password').value;
+
+        if (!email || !password) {
+            e.preventDefault();
+            showAlert('Please fill in all required fields', 'danger');
+        }
+    });
+</script>
+{% endblock %} 

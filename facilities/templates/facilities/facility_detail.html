@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ facility.name }} - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                {% if facility.image %}
+                    <img src="{{ facility.image.url }}" class="card-img-top" alt="{{ facility.name }}">
+                {% endif %}
+                <div class="card-body">
+                    <h2 class="card-title">{{ facility.name }}</h2>
+                    <div class="mb-3">
+                        <span class="badge bg-primary">{{ facility.get_category_display }}</span>
+                        <span class="badge {% if facility.is_available %}bg-success{% else %}bg-danger{% endif %}">
+                            {{ facility.is_available|yesno:"Available,Not Available" }}
+                        </span>
+                    </div>
+                    
+                    <dl class="row">
+                        <dt class="col-sm-3">Location</dt>
+                        <dd class="col-sm-9">{{ facility.location }}</dd>
+                        
+                        {% if facility.capacity %}
+                            <dt class="col-sm-3">Capacity</dt>
+                            <dd class="col-sm-9">{{ facility.capacity }} people</dd>
+                        {% endif %}
+                        
+                        {% if facility.operating_hours %}
+                            <dt class="col-sm-3">Operating Hours</dt>
+                            <dd class="col-sm-9">{{ facility.operating_hours }}</dd>
+                        {% endif %}
+                        
+                        <dt class="col-sm-3">Description</dt>
+                        <dd class="col-sm-9">{{ facility.description|linebreaks }}</dd>
+                    </dl>
+                    
+                    {% if user.role in 'ADMIN,WARDEN' %}
+                        <div class="mt-4">
+                            <a href="{% url 'facilities:edit_facility' facility.id %}" class="btn btn-primary">
+                                <i class="fas fa-edit"></i> Edit Facility
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            {% if facility.is_available %}
+                <div class="card shadow mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title">Book This Facility</h4>
+                        <p class="card-text">Make a booking request for this facility.</p>
+                        <a href="{% url 'facilities:book_facility' facility.id %}" class="btn btn-primary">
+                            <i class="fas fa-calendar-plus"></i> Book Now
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <h4 class="card-title">Report Maintenance</h4>
+                    <p class="card-text">Report any issues or maintenance needs for this facility.</p>
+                    <a href="{% url 'facilities:report_maintenance' facility.id %}" class="btn btn-warning">
+                        <i class="fas fa-tools"></i> Report Issue
+                    </a>
+                </div>
+            </div>
+            
+            {% if bookings %}
+                <div class="card shadow mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Recent Bookings</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for booking in bookings %}
+                            <div class="booking-item mb-3">
+                                <h6>{{ booking.purpose|truncatechars:50 }}</h6>
+                                <p class="mb-1">
+                                    <i class="fas fa-calendar"></i> {{ booking.booking_date|date:"M d, Y" }}
+                                </p>
+                                <p class="mb-1">
+                                    <i class="fas fa-clock"></i> {{ booking.start_time|time:"g:i A" }} - 
+                                    {{ booking.end_time|time:"g:i A" }}
+                                </p>
+                                <span class="badge {% if booking.status == 'APPROVED' %}bg-success
+                                              {% elif booking.status == 'PENDING' %}bg-warning
+                                              {% elif booking.status == 'REJECTED' %}bg-danger
+                                              {% else %}bg-secondary{% endif %}">
+                                    {{ booking.get_status_display }}
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            
+            {% if maintenance_requests %}
+                <div class="card shadow">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Recent Maintenance Requests</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for request in maintenance_requests %}
+                            <div class="maintenance-item mb-3">
+                                <h6>{{ request.title }}</h6>
+                                <p class="mb-1">
+                                    <span class="badge {% if request.priority == 'URGENT' %}bg-danger
+                                                  {% elif request.priority == 'HIGH' %}bg-warning
+                                                  {% elif request.priority == 'MEDIUM' %}bg-info
+                                                  {% else %}bg-secondary{% endif %}">
+                                        {{ request.get_priority_display }}
+                                    </span>
+                                    <span class="badge {% if request.status == 'COMPLETED' %}bg-success
+                                                  {% elif request.status == 'IN_PROGRESS' %}bg-primary
+                                                  {% elif request.status == 'PENDING' %}bg-warning
+                                                  {% else %}bg-secondary{% endif %}">
+                                        {{ request.get_status_display }}
+                                    </span>
+                                </p>
+                                <p class="small text-muted mb-0">
+                                    Reported on {{ request.created_at|date:"M d, Y" }}
+                                </p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

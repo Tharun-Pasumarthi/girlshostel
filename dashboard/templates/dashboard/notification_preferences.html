@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}Notification Preferences - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">Notification Preferences</h2>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <h4>Notification Channels</h4>
+                            <div class="form-check mb-2">
+                                <input type="checkbox" class="form-check-input" id="email_notifications" 
+                                       name="email_notifications" {% if form.email_notifications.value %}checked{% endif %}>
+                                <label class="form-check-label" for="email_notifications">
+                                    Email Notifications
+                                </label>
+                                <div class="form-text">
+                                    Receive notifications via email for important updates and alerts.
+                                </div>
+                            </div>
+                            
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="push_notifications" 
+                                       name="push_notifications" {% if form.push_notifications.value %}checked{% endif %}>
+                                <label class="form-check-label" for="push_notifications">
+                                    Push Notifications
+                                </label>
+                                <div class="form-text">
+                                    Receive real-time notifications in your browser.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h4>Notification Types</h4>
+                            
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="notify_attendance" 
+                                               name="notification_types[attendance]" 
+                                               {% if 'attendance' in form.notification_types.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="notify_attendance">
+                                            Attendance
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input" id="notify_attendance_mark" 
+                                               name="notification_types[attendance_mark]" 
+                                               {% if 'attendance_mark' in form.notification_types.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="notify_attendance_mark">
+                                            When attendance is marked
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="notify_attendance_report" 
+                                               name="notification_types[attendance_report]" 
+                                               {% if 'attendance_report' in form.notification_types.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="notify_attendance_report">
+                                            Daily attendance reports
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="notify_fees" 
+                                               name="notification_types[fees]" 
+                                               {% if 'fees' in form.notification_types.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="notify_fees">
+                                            Fees
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input" id="notify_fees_due" 
+                                               name="notification_types[fees_due]" 
+                                               {% if 'fees_due' in form.notification_types.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="notify_fees_due">
+                                            When fees are due
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="notify_fees_paid" 
+                                               name="notification_types[fees_paid]" 
+                                               {% if 'fees_paid' in form.notification_types.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="notify_fees_paid">
+                                            When fees are paid
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="notify_complaints" 
+                                               name="notification_types[complaints]" 
+                                               {% if 'complaints' in form.notification_types.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="notify_complaints">
+                                            Complaints
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input" id="notify_complaint_submitted" 
+                                               name="notification_types[complaint_submitted]" 
+                                               {% if 'complaint_submitted' in form.notification_types.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="notify_complaint_submitted">
+                                            When a complaint is submitted
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="notify_complaint_status" 
+                                               name="notification_types[complaint_status]" 
+                                               {% if 'complaint_status' in form.notification_types.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="notify_complaint_status">
+                                            When complaint status changes
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="notify_maintenance" 
+                                               name="notification_types[maintenance]" 
+                                               {% if 'maintenance' in form.notification_types.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="notify_maintenance">
+                                            Maintenance
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input" id="notify_maintenance_request" 
+                                               name="notification_types[maintenance_request]" 
+                                               {% if 'maintenance_request' in form.notification_types.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="notify_maintenance_request">
+                                            When a maintenance request is submitted
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="notify_maintenance_status" 
+                                               name="notification_types[maintenance_status]" 
+                                               {% if 'maintenance_status' in form.notification_types.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="notify_maintenance_status">
+                                            When maintenance status changes
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Save Preferences</button>
+                            <a href="{% url 'dashboard:dashboard' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

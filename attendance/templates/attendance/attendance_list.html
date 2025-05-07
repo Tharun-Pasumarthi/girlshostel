@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Attendance</h2>
+        <div>
+            <a href="{% url 'attendance:mark_attendance' %}" class="btn btn-primary me-2">
+                <i class="fas fa-plus"></i> Mark Attendance
+            </a>
+            <a href="{% url 'attendance:attendance_report' %}" class="btn btn-info">
+                <i class="fas fa-chart-bar"></i> View Reports
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Total Students</th>
+                            <th>Present</th>
+                            <th>Absent</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5" class="text-center">No attendance records found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Student Dashboard - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            {% if user.profile.avatar %}
+                                <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name }}" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                            {% else %}
+                                <img src="{% static 'images/default-avatar.png' %}" alt="{{ user.get_full_name }}" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h2 class="mb-1">Welcome, {{ user.get_full_name }}!</h2>
+                            <p class="text-muted mb-0">Room {{ user.student.room.number }} | {{ user.student.room.block.name }}</p>
+                        </div>
+                        <div class="text-end">
+                            <a href="{% url 'profile' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-user-edit me-2"></i>Edit Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm stat-card bg-primary">
+                <div class="card-body">
+                    <i class="fas fa-rupee-sign"></i>
+                    <div class="stat-value">{{ due_amount }}</div>
+                    <div class="stat-label">Due Amount</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm stat-card bg-success">
+                <div class="card-body">
+                    <i class="fas fa-calendar-check"></i>
+                    <div class="stat-value">{{ attendance_percentage }}%</div>
+                    <div class="stat-label">Attendance</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm stat-card bg-warning">
+                <div class="card-body">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <div class="stat-value">{{ pending_complaints }}</div>
+                    <div class="stat-label">Pending Complaints</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm stat-card bg-info">
+                <div class="card-body">
+                    <i class="fas fa-bell"></i>
+                    <div class="stat-value">{{ unread_notifications }}</div>
+                    <div class="stat-label">Unread Notifications</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-md-8">
+            <!-- Upcoming Events -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Upcoming Events</h5>
+                </div>
+                <div class="card-body">
+                    {% if events %}
+                        <div class="list-group list-group-flush">
+                            {% for event in events %}
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ event.title }}</h6>
+                                        <small class="text-muted">{{ event.start_date|date:"M d, Y" }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ event.description|truncatewords:30 }}</p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-map-marker-alt me-1"></i>{{ event.location }}
+                                    </small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">No upcoming events.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Recent Announcements -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Recent Announcements</h5>
+                </div>
+                <div class="card-body">
+                    {% if announcements %}
+                        <div class="list-group list-group-flush">
+                            {% for announcement in announcements %}
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ announcement.title }}</h6>
+                                        <small class="text-muted">{{ announcement.created_at|date:"M d, Y" }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ announcement.content|truncatewords:30 }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">No recent announcements.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-md-4">
+            <!-- Mess Menu -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Today's Menu</h5>
+                </div>
+                <div class="card-body">
+                    {% if mess_menu %}
+                        <div class="menu-card">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0">{{ mess_menu.date|date:"l, F d, Y" }}</h6>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="menu-item">
+                                    <h6 class="mb-2">Breakfast</h6>
+                                    <p class="mb-0">{{ mess_menu.breakfast }}</p>
+                                </div>
+                                <div class="menu-item">
+                                    <h6 class="mb-2">Lunch</h6>
+                                    <p class="mb-0">{{ mess_menu.lunch }}</p>
+                                </div>
+                                <div class="menu-item">
+                                    <h6 class="mb-2">Dinner</h6>
+                                    <p class="mb-0">{{ mess_menu.dinner }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">Menu not available for today.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Quick Links</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'room_details' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-bed me-2"></i>Room Details
+                        </a>
+                        <a href="{% url 'payment_history' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-rupee-sign me-2"></i>Payment History
+                        </a>
+                        <a href="{% url 'leave_application' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-calendar-alt me-2"></i>Apply for Leave
+                        </a>
+                        <a href="{% url 'complaints_list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-exclamation-circle me-2"></i>Complaints
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Summary -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Attendance Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="attendance-calendar">
+                        <div class="text-center mb-3">
+                            <h6 class="mb-0">{{ current_month|date:"F Y" }}</h6>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="attendance-status present" title="Present"></span>
+                            <span class="attendance-status absent" title="Absent"></span>
+                            <span class="attendance-status late" title="Late"></span>
+                        </div>
+                        <div class="text-center">
+                            <p class="mb-0">
+                                <strong>Present:</strong> {{ present_days }} days<br>
+                                <strong>Absent:</strong> {{ absent_days }} days<br>
+                                <strong>Late:</strong> {{ late_days }} days
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+    tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Update stats every 5 minutes
+    setInterval(function() {
+        fetch('{% url "student_dashboard_stats" %}')
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = data.due_amount;
+                document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = data.attendance_percentage + '%';
+                document.querySelector('.stat-card:nth-child(3) .stat-value').textContent = data.pending_complaints;
+                document.querySelector('.stat-card:nth-child(4) .stat-value').textContent = data.unread_notifications;
+            });
+    }, 300000);
+</script>
+{% endblock %} 

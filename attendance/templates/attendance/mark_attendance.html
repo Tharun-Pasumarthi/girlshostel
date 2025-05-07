@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Mark Attendance - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Mark Attendance</h2>
+        <a href="{% url 'attendance:attendance_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <form method="post" id="attendance-form">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="date" class="form-label">Date</label>
+                    <input type="date" class="form-control" id="date" name="date" 
+                           value="{{ today|date:'Y-m-d' }}" required>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Status</th>
+                                <th>Check-in Time</th>
+                                <th>Check-out Time</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                            <tr>
+                                <td>{{ student.get_full_name }}</td>
+                                <td>
+                                    <select class="form-select" name="status_{{ student.id }}" required>
+                                        <option value="PRESENT">Present</option>
+                                        <option value="ABSENT">Absent</option>
+                                        <option value="LATE">Late</option>
+                                        <option value="EXCUSED">Excused</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="time" class="form-control" name="check_in_{{ student.id }}">
+                                </td>
+                                <td>
+                                    <input type="time" class="form-control" name="check_out_{{ student.id }}">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" name="notes_{{ student.id }}" 
+                                           placeholder="Optional notes">
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">No students found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Attendance
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.getElementById('attendance-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (confirm('Are you sure you want to save the attendance records?')) {
+            this.submit();
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %} 

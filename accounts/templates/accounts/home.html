@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome to Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6">
+            <h1 class="display-4 fw-bold mb-4">Welcome to Girls' Hostel Management System</h1>
+            <p class="lead mb-4">A comprehensive solution for managing your hostel operations efficiently and effectively.</p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                <a href="{% url 'accounts:login' %}" class="btn btn-primary btn-lg px-4 me-md-2">Login</a>
+                <a href="{% url 'accounts:signup' %}" class="btn btn-outline-secondary btn-lg px-4">Sign Up</a>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <img src="https://source.unsplash.com/random/600x400/?hostel" alt="Hostel Image" class="img-fluid rounded shadow-lg">
+        </div>
+    </div>
+
+    <div class="row mt-5 pt-5">
+        <div class="col-12 text-center mb-4">
+            <h2 class="fw-bold">Key Features</h2>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-bed fa-3x text-primary mb-3"></i>
+                    <h3 class="card-title h5">Room Management</h3>
+                    <p class="card-text">Efficiently manage room allocations, track occupancy, and handle maintenance requests.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                    <h3 class="card-title h5">Student Portal</h3>
+                    <p class="card-text">Easy access to room details, payment history, and complaint submission.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
+                    <h3 class="card-title h5">Admin Dashboard</h3>
+                    <p class="card-text">Comprehensive overview of hostel operations and management tools.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5 pt-5">
+        <div class="col-12 text-center mb-4">
+            <h2 class="fw-bold">Quick Stats</h2>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body text-center">
+                    <h3 class="display-4 fw-bold">{{ total_rooms }}</h3>
+                    <p class="lead">Total Rooms</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body text-center">
+                    <h3 class="display-4 fw-bold">{{ available_rooms }}</h3>
+                    <p class="lead">Available Rooms</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body text-center">
+                    <h3 class="display-4 fw-bold">{{ total_students }}</h3>
+                    <p class="lead">Total Students</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

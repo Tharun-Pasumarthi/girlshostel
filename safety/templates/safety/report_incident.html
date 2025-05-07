@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Report Incident - Girls' Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">Report Safety Incident</h2>
+                    
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Incident Title</label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   placeholder="Brief description of the incident" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" 
+                                   placeholder="Where did the incident occur?" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="severity" class="form-label">Severity Level</label>
+                            <select class="form-select" id="severity" name="severity" required>
+                                <option value="">Select severity level</option>
+                                <option value="LOW">Low - Minor issue, no immediate danger</option>
+                                <option value="MEDIUM">Medium - Requires attention but not urgent</option>
+                                <option value="HIGH">High - Urgent attention required</option>
+                                <option value="CRITICAL">Critical - Immediate action needed</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="description" class="form-label">Detailed Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="5" 
+                                      placeholder="Please provide a detailed description of the incident..." required></textarea>
+                            <div class="form-text">
+                                Include relevant details such as time, people involved, and any immediate actions taken.
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Submit Report</button>
+                            <a href="{% url 'safety:incident_list' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
